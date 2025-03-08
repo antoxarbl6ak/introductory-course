@@ -10,10 +10,6 @@ import csv
 import os
 
 
-def is_file_empty(file_path):
-    return os.stat(file_path).st_size == 0 
-
-
 keys = ['publication number',
         'name',
         'date of publication',
