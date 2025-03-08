@@ -6,6 +6,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.expected_conditions import all_of
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 from selenium.webdriver.support.expected_conditions import text_to_be_present_in_element
+import csv
+import os
+
+
+def is_file_empty(file_path):
+    return os.stat(file_path).st_size == 0 
 
 
 keys = ['publication number',
@@ -16,6 +22,11 @@ keys = ['publication number',
         'applicant',
         'inventor',
         'patent']
+
+#хз как сделать чтобы каждый раз не очищался файл (тут из-за параметра mode='w'), но думаю особо не пригодится
+with open("output.csv", mode="w", encoding="utf-8", newline='') as file:
+    writer = csv.DictWriter(file, fieldnames=keys)
+    writer.writeheader()
 
 driver = webdriver.Chrome()
 driver.get(r"https://patentscope.wipo.int/search/ru/advancedSearch.jsf")
@@ -71,7 +82,9 @@ for i in range(20):
         print('\n')
         c += 1
     print(f"{i+1} завершено")
-    #сюда добавить импорт в csv, по 200 записей как раз норм будет
+    with open("output.csv", mode="a", encoding="utf-8", newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=keys)
+            writer.writerows(results)
     driver.find_element(By.CSS_SELECTOR, '[class="ui-commandlink ui-widget ps-link--has-icon js-paginator-next"]').click()
     WebDriverWait(driver, 10).until(
         text_to_be_present_in_element((By.CSS_SELECTOR, '[id="resultListForm:pageNumber"]'), f'{i+2}')
