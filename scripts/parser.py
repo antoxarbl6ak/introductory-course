@@ -1,14 +1,10 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support.expected_conditions import all_of
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 from selenium.webdriver.support.expected_conditions import text_to_be_present_in_element
-import csv
-import os
-
+import pandas as pd
 
 keys = ['publication number',
         'name',
@@ -19,10 +15,6 @@ keys = ['publication number',
         'inventor',
         'patent']
 
-#хз как сделать чтобы каждый раз не очищался файл (тут из-за параметра mode='w'), но думаю особо не пригодится
-with open("output.csv", mode="w", encoding="utf-8", newline='') as file:
-    writer = csv.DictWriter(file, fieldnames=keys)
-    writer.writeheader()
 
 driver = webdriver.Chrome()
 driver.get(r"https://patentscope.wipo.int/search/ru/advancedSearch.jsf")
@@ -45,12 +37,12 @@ c = 1
 WebDriverWait(driver, 20).until(presence_of_element_located((By.ID, "resultListCommandsForm:perPage:input")))
 select_num_elements = Select(driver.find_element(By.ID, "resultListCommandsForm:perPage:input"))
 select_num_elements.select_by_value("200")
-for i in range(20):
+results = []
+for i in range(25):
     WebDriverWait(driver, 20).until(
         presence_of_element_located((By.CSS_SELECTOR, '[id="resultListForm:resultTable:199:patentResult"]'))
     )
     table = driver.find_element(By.ID, "resultListForm:resultTable_data")
-    results = []
     for cell in table.find_elements(By.TAG_NAME, "tr"):
         pubnum = cell.find_element(By.TAG_NAME, 'a').text
         name = cell.find_element(By.CSS_SELECTOR, '[class="ps-patent-result--title--title content--text-wrap"]').text
@@ -71,20 +63,20 @@ for i in range(20):
             'inventor': inventor,
             'patent': patent
         })
-    for t in results:
+        """for t in results:
         print(c)
         for j in keys:
             print(f'{j}:{t[j]}')
-        print('\n')
+        print('\n')"""
         c += 1
     print(f"{i+1} завершено")
-    with open("output.csv", mode="a", encoding="utf-8", newline='') as file:
-            writer = csv.DictWriter(file, fieldnames=keys)
-            writer.writerows(results)
     driver.find_element(By.CSS_SELECTOR, '[class="ui-commandlink ui-widget ps-link--has-icon js-paginator-next"]').click()
     WebDriverWait(driver, 10).until(
         text_to_be_present_in_element((By.CSS_SELECTOR, '[id="resultListForm:pageNumber"]'), f'{i+2}')
     )
     driver.refresh()
+
+df = pd.DataFrame(results)
+df.to_csv(r"../data/french-patents.csv")
 
 driver.close()
