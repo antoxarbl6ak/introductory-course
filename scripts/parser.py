@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located
 from selenium.webdriver.support.expected_conditions import text_to_be_present_in_element
-import pandas as pd
+import csv
 
 keys = ['publication number',
         'name',
@@ -37,11 +37,15 @@ c = 1
 WebDriverWait(driver, 20).until(presence_of_element_located((By.ID, "resultListCommandsForm:perPage:input")))
 select_num_elements = Select(driver.find_element(By.ID, "resultListCommandsForm:perPage:input"))
 select_num_elements.select_by_value("200")
-results = []
+out = open(r"../data/french-patents-temp.csv", 'w', newline='', encoding="utf-8-sig")
+dictwriter = csv.DictWriter(out, ['publication number', 'name', 'date of publication', 'ipc',
+                                   'application number', 'applicant', 'inventor', 'patent'])
+dictwriter.writeheader()
 for i in range(25):
     WebDriverWait(driver, 20).until(
         presence_of_element_located((By.CSS_SELECTOR, '[id="resultListForm:resultTable:199:patentResult"]'))
     )
+    results = []
     table = driver.find_element(By.ID, "resultListForm:resultTable_data")
     for cell in table.find_elements(By.TAG_NAME, "tr"):
         pubnum = cell.find_element(By.TAG_NAME, 'a').text
@@ -69,6 +73,7 @@ for i in range(25):
             print(f'{j}:{t[j]}')
         print('\n')"""
         c += 1
+    dictwriter.writerows(results)
     print(f"{i+1} завершено")
     driver.find_element(By.CSS_SELECTOR, '[class="ui-commandlink ui-widget ps-link--has-icon js-paginator-next"]').click()
     WebDriverWait(driver, 10).until(
@@ -76,7 +81,5 @@ for i in range(25):
     )
     driver.refresh()
 
-df = pd.DataFrame(results)
-df.to_csv(r"../data/french-patents.csv")
-
+out.close()
 driver.close()
