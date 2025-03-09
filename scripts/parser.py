@@ -67,11 +67,6 @@ for i in range(25):
             'inventor': inventor,
             'patent': patent
         })
-        """for t in results:
-        print(c)
-        for j in keys:
-            print(f'{j}:{t[j]}')
-        print('\n')"""
         c += 1
     dictwriter.writerows(results)
     print(f"{i+1} завершено")
