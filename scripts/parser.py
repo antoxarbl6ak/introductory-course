@@ -6,15 +6,6 @@ from selenium.webdriver.support.expected_conditions import presence_of_element_l
 from selenium.webdriver.support.expected_conditions import text_to_be_present_in_element
 import csv
 
-keys = ['publication number',
-        'name',
-        'date of publication',
-        'ipc',
-        'application number',
-        'applicant',
-        'inventor',
-        'patent']
-
 
 driver = webdriver.Chrome()
 driver.get(r"https://patentscope.wipo.int/search/ru/advancedSearch.jsf")
@@ -33,7 +24,6 @@ select_lang.select_by_value("fr")
 search = driver.find_element(By.ID, "advancedSearchForm:searchButton")
 search.click()
 
-c = 1
 WebDriverWait(driver, 20).until(presence_of_element_located((By.ID, "resultListCommandsForm:perPage:input")))
 select_num_elements = Select(driver.find_element(By.ID, "resultListCommandsForm:perPage:input"))
 select_num_elements.select_by_value("200")
@@ -67,7 +57,6 @@ for i in range(25):
             'inventor': inventor,
             'patent': patent
         })
-        c += 1
     dictwriter.writerows(results)
     print(f"{i+1} завершено")
     driver.find_element(By.CSS_SELECTOR, '[class="ui-commandlink ui-widget ps-link--has-icon js-paginator-next"]').click()
