@@ -5,9 +5,10 @@ from sklearn.metrics import classification_report
 
 def classify(inputcsv, outputcsv="..\\data\\output.csv", logs=False):
     df = pd.read_csv(inputcsv)
-    df_temp = df.drop(columns=["Row_id"])
-    
-    # preprocessing dataset
+    if "Row_id" in df.keys():
+        df_temp = df.drop(columns=["Row_id"])
+    else:
+        df_temp = df
 
     # loading model
     model = xgb.XGBClassifier()
