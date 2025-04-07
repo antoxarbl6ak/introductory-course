@@ -1,5 +1,5 @@
 import xgboost as xgb
-import os
+import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
@@ -66,4 +66,4 @@ best_model.fit(x_train, y_train)
 y_pred = best_model.predict(x_test)
 print(classification_report(y_test, y_pred, digits=4))
 
-best_model.save_model("..\\data\\bestmodel-gboost.json")
+joblib.dump(best_model, "..\\data\\best_model-gboost.joblib")

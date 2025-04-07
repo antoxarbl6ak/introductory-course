@@ -1,5 +1,6 @@
 import pandas as pd
 import xgboost as xgb
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 
@@ -11,8 +12,9 @@ def classify(inputcsv, outputcsv="..\\data\\output.csv", logs=False):
         df_temp = df
 
     # loading model
-    model = xgb.XGBClassifier()
-    model.load_model(r"D:\Users\anton\Desktop\rtu-mirea\practice\introductory-course\data\bestmodel-gboost.json")
+    model = joblib.load("..\\data\\best_model-gboost.joblib")
+    #model.load_model(r"D:\Users\anton\Desktop\rtu-mirea\practice\introductory-course\data\bestmodel-gboost.json")
+
     
     # predicting
     predictions = model.predict(df_temp)
